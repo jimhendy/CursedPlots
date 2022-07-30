@@ -70,4 +70,4 @@ def game_of_life(stdscr: _curses.window, iterations: Optional[int] = None):
 
 
 if __name__ == "__main__":
-    curses.wrapper(game_of_life, iterations=1_000)
+    curses.wrapper(game_of_life)

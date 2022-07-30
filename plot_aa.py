@@ -11,8 +11,8 @@ from utils.xiaolin_wu import get_points
 
 np.random.seed(123)
 
-CHARACTERS = list(' .+#')
-'''
+CHARACTERS = list(" .+#")
+"""
 CHARACTERS = [
     " ",
     "\u2581",
@@ -25,7 +25,7 @@ CHARACTERS = [
     "\u2588",
     "\u2589",
 ]
-'''
+"""
 # Borrowing from: http://drsfenner.org/blog/2015/08/game-of-life-in-numpy-2/
 
 
@@ -90,7 +90,7 @@ def plot(stdscr: _curses.window, iterations: Optional[int] = None):
         data_to_grid(x=x, y=y, grid=board)
         show(stdscr=stdscr, grid=board)
         t += 1
-        #time.sleep(2e-2)
+        # time.sleep(2e-2)
 
     time.sleep(2)
 

@@ -1,3 +1,8 @@
+from loguru import logger
+
+from utils.decorators import log_all_args
+
+
 class XiaolinWuException(Exception):
     pass
 
@@ -16,10 +21,12 @@ def _rfpart(x: float) -> float:
     return 1 - _fpart(x)
 
 
+@log_all_args()
 def _add_point(points, x, y, colour, steep):
     if not colour:
         return
     p = _swap_if_steep(x, y, steep)
+    logger.info(f"Adding point ({x},{y}) with colour {colour}")
     if p in points:
         raise XiaolinWuException(f"{p} already in points: {points}")
     points[p] = colour
@@ -46,6 +53,7 @@ def get_points(x1, y1, x2, y2):
 
     grad = dy / dx if dx != 0 else 1
 
+    @log_all_args()
     def analyse_endpoint(x, y):
         xend = round(x)
         yend = y + grad * (xend - x)

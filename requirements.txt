@@ -1,2 +1,6 @@
 bresenham
 numpy
+loguru
+black
+isort
+pytest

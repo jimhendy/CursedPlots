@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 import _curses
 import bresenham
 import numpy as np
+
 from utils.xiaolin_wu import get_points
 
 np.random.seed(123)
@@ -55,7 +56,7 @@ def data_to_grid(x: np.ndarray, y: np.ndarray, grid: np.ndarray) -> None:
 
 
 def plot(stdscr: _curses.window, iterations: Optional[int] = None):
-    curses.curs_set(False) 
+    curses.curs_set(False)
     stdscr.clear()
 
     size: Tuple[int, int] = tuple(i - 1 for i in stdscr.getmaxyx())
