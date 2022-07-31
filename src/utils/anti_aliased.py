@@ -120,7 +120,9 @@ def _interpolate_regularly(data: np.ndarray[float, float]) -> np.ndarray[float, 
     return data_utils.xy_to_data(interp_x, interp_y)
 
 
-def _inverse_distance_to_vertex(data: np.ndarray, increase_x: bool, increase_y: bool):
+def _inverse_distance_to_vertex(
+    data: np.ndarray, increase_x: bool, increase_y: bool
+) -> Tuple[np.ndarray, np.ndarray]:
     vertex = data.astype(np.int64)  # Round down to bottom left vertex
     if increase_x:
         vertex[:, 0] += 1
@@ -131,7 +133,7 @@ def _inverse_distance_to_vertex(data: np.ndarray, increase_x: bool, increase_y: 
     return vertex, weight
 
 
-def _anti_aliased_data(data: np.ndarray[float, float]):
+def _anti_aliased_data(data: np.ndarray[float, float]) -> Tuple[np.ndarray, np.ndarray]:
     """
     Snap the `data` coordinates to integers and calculate a weight for each interger vertex
     using the distance from the input `data`.
@@ -164,7 +166,9 @@ def _anti_aliased_data(data: np.ndarray[float, float]):
     return locs, weights
 
 
-def anti_alias(data: np.ndarray, grid_maxs: Tuple[int, ...]):
+def anti_alias(
+    data: np.ndarray, grid_maxs: Tuple[int, ...]
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Translate the supplied data onto the grid and smooth via anti-aliasing
     """

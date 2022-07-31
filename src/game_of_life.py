@@ -13,7 +13,7 @@ characters = (" ", "\u2665")
 # Borrowing from: http://drsfenner.org/blog/2015/08/game-of-life-in-numpy-2/
 
 
-def show_game(stdscr: _curses.window, grid: np.ndarray):
+def show_game(stdscr: _curses.window, grid: np.ndarray) -> None:
     """
     Display the current grid
     """
