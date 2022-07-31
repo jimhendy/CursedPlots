@@ -1,17 +1,22 @@
 import numpy as np
-import pytest
 
 from utils import anti_aliased, data_utils
 
 
 class TestTranslateDataToGrid:
+    """
+    Test the _translate_data_to_grid function
+    """
+
     @staticmethod
     def test_direct_translate():
         x = [0, 0.5, 1]
         y = [0, 0.5, 1]
         data = data_utils.xy_to_data(x, y)
         grid_maxs = [1, 1]
-        actual = anti_aliased._translate_data_to_grid(data=data, grid_maxs=grid_maxs)
+        actual = anti_aliased._translate_data_to_grid(
+            data=data, grid_maxs=grid_maxs, buffer=0
+        )
         np.testing.assert_equal(data, actual)
 
     @staticmethod
@@ -20,7 +25,9 @@ class TestTranslateDataToGrid:
         y = [0, 0.5, 1]
         data = data_utils.xy_to_data(x, y)
         grid_maxs = [10, 10]
-        actual = anti_aliased._translate_data_to_grid(data=data, grid_maxs=grid_maxs)
+        actual = anti_aliased._translate_data_to_grid(
+            data=data, grid_maxs=grid_maxs, buffer=0
+        )
         expected = data_utils.xy_to_data(
             [i * grid_maxs[0] for i in x], [i * grid_maxs[1] for i in y]
         )
@@ -32,7 +39,9 @@ class TestTranslateDataToGrid:
         y = [0, 1]
         data = data_utils.xy_to_data(x, y)
         grid_maxs = [10, 5]
-        actual = anti_aliased._translate_data_to_grid(data=data, grid_maxs=grid_maxs)
+        actual = anti_aliased._translate_data_to_grid(
+            data=data, grid_maxs=grid_maxs, buffer=0
+        )
         expected = data_utils.xy_to_data(
             [i * grid_maxs[0] for i in x], [i * grid_maxs[1] for i in y]
         )
@@ -44,7 +53,9 @@ class TestTranslateDataToGrid:
         y = np.linspace(0, 200)
         data = data_utils.xy_to_data(x, y)
         grid_maxs = [10, 2]
-        actual = anti_aliased._translate_data_to_grid(data=data, grid_maxs=grid_maxs)
+        actual = anti_aliased._translate_data_to_grid(
+            data=data, grid_maxs=grid_maxs, buffer=0
+        )
         expected = data_utils.xy_to_data(
             [i * grid_maxs[0] / x.max() for i in x],
             [i * grid_maxs[1] / y.max() for i in y],
@@ -58,11 +69,53 @@ class TestTranslateDataToGrid:
         scale = lambda i: (i - min(x)) / (max(x) - min(x))
         data = data_utils.xy_to_data(x, y)
         grid_maxs = [10, 5]
-        actual = anti_aliased._translate_data_to_grid(data=data, grid_maxs=grid_maxs)
+        actual = anti_aliased._translate_data_to_grid(
+            data=data, grid_maxs=grid_maxs, buffer=0
+        )
         expected = data_utils.xy_to_data(
             [scale(i) * grid_maxs[0] for i in x], [scale(i) * grid_maxs[1] for i in y]
         )
         np.testing.assert_equal(expected, actual)
+
+
+class TestGetExtreme:
+    @staticmethod
+    def test_max_no_lims():
+        data = list(range(10))
+        expected = max(data)
+        actual = anti_aliased._get_max(lims=None, series=data)
+        assert expected == actual
+
+    @staticmethod
+    def test_min_no_lims():
+        data = list(range(10))
+        expected = min(data)
+        actual = anti_aliased._get_min(lims=None, series=data)
+        assert expected == actual
+
+    @staticmethod
+    def test_max_with_lims():
+        data = list(range(10))
+        lims = [0, 5]
+        expected = lims[1]
+        actual = anti_aliased._get_max(lims=lims, series=data)
+        assert expected == actual
+
+    @staticmethod
+    def test_min_with_lims():
+        data = list(range(10))
+        lims = [-100, 5]
+        expected = lims[0]
+        actual = anti_aliased._get_min(lims=lims, series=data)
+        assert expected == actual
+
+    @staticmethod
+    def test_max_offset():
+        data = list(range(10))
+        buffer = 0.5
+        expected = max(data) + buffer * np.ptp(data)
+        actual = anti_aliased._get_max(lims=None, series=data, buffer=buffer)
+        assert actual == expected
 
 
 class TestInterpolateRegularly:

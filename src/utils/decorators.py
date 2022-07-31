@@ -5,6 +5,9 @@ from loguru import logger
 
 
 def log_all_args(log_level: str = "DEBUG") -> Callable:
+    """
+    Log all the arguments and return value from the wrapped function
+    """
     level_logger = getattr(logger, log_level.lower())
 
     def decorator(func: Callable) -> Callable:
@@ -15,9 +18,9 @@ def log_all_args(log_level: str = "DEBUG") -> Callable:
             )
             try:
                 value = func(*args, **kwargs)
-            except Exception as e:
+            except Exception as exception:
                 logger.error(msg)
-                raise e
+                raise exception
             msg += f"\nreturns: {value}"
             level_logger(msg)
             return value

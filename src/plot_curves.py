@@ -5,16 +5,18 @@ from typing import Callable, List, Optional, Tuple
 
 import _curses
 import numpy as np
-from loguru import logger
 
 from utils import anti_aliased, data_utils
 
 
 class PlottingException(Exception):
-    ...
+    """Simple exception to localise errors to Plot subclasses"""
 
 
 class Plot(ABC):
+    """
+    Abstract base class for a plot. Implements screen access functionality
+    """
 
     CHARACTERS = list(
         r"""$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^`'. """
@@ -38,14 +40,17 @@ class Plot(ABC):
 
     @property
     def rows(self):
+        """Number of rows on screen"""
         return self.screen_size[0]
 
     @property
     def columns(self):
+        """Number of columns on screen"""
         return self.screen_size[1]
 
     def clear(self) -> None:
-        window_size = self.screen.getmaxyx() # Use directly for full clean
+        """Clear the current screen by filling all characters with spaces"""
+        window_size = self.screen.getmaxyx()  # Use directly for full clean
         empty_string = " " * window_size[0] * (window_size[1] - 1)
         self.screen.addstr(0, 0, empty_string)
 
@@ -56,6 +61,9 @@ class Plot(ABC):
     def set_char(
         self, row_num: int, col_num: int, char: str, color_num: int = 0
     ) -> None:
+        """
+        Add a character to the screen at position `row_num` and `col_num`.
+        """
         if row_num >= self.rows:
             raise PlottingException(
                 f"Cannot add to row {row_num} as screen is only {self.rows} rows"
@@ -67,45 +75,53 @@ class Plot(ABC):
         self.screen.addch(row_num, col_num, char, curses.color_pair(color_num + 2))
 
     def refresh(self):
+        """Print the current screen to the terminal"""
         self.screen.refresh()
 
     @abstractmethod
     def plot(self):
-        ...
+        """Abstract method for plotting the subclass"""
 
 
-def get_data(time: int):
+def get_data(time_: int):
+    """Example sin function"""
     x_span = 10
     x_points = 50
-    x = np.linspace(start=time, stop=time + x_span, num=x_points)
-    y = (np.arange(len(x)) + 1) * np.sin(x + time)
+    x = np.linspace(start=time_, stop=time_ + x_span, num=x_points)
+    y = (np.arange(len(x)) + 1) * np.sin(x + time_)
     return data_utils.xy_to_data(x, y)
 
 
-def get_data_2(time: int):
+def get_data_2(time_: int):
+    """Example cos function"""
     x_span = 10
     x_points = 100
-    x = np.linspace(start=time, stop=time + x_span, num=x_points)
+    x = np.linspace(start=time_, stop=time_ + x_span, num=x_points)
     y = np.cos(x * 3) * (np.arange(len(x)) + 1)[::-1]
     return data_utils.xy_to_data(x, y)
 
 
-def get_data_3(time: int):
+def get_data_3(time_: int):
+    """Example power function"""
     x_span = 10
     x_points = 100
-    x = np.linspace(start=1, stop=time + x_span, num=x_points)
+    x = np.linspace(start=1, stop=time_ + x_span, num=x_points)
     y = np.power(x[:], 2)
     return data_utils.xy_to_data(x, y)
 
 
 class LinePlot(Plot):
+    """
+    Simple line plot implementing anti-aliasing
+    """
+
     def __init__(self, screen: _curses.window, functions: List[Callable]) -> None:
         super().__init__(screen=screen)
         self.functions = functions
 
     def _fill_grid(self, data: np.ndarray, color_num: int) -> None:
 
-        grid_maxs = [i - 2 for i in self.screen_size[::-1]]
+        grid_maxs: Tuple[int, ...] = tuple(i - 2 for i in self.screen_size[::-1])
         locations, weights = anti_aliased.anti_alias(data, grid_maxs)
 
         for point, alpha in zip(locations, weights):
@@ -117,23 +133,27 @@ class LinePlot(Plot):
             )
 
     def plot(self, iterations: Optional[int] = None):
+        """
+        Animate line plots for the supplied `functions`.
+        """
 
-        for t in range(iterations or int(10e10)):
+        for time_ in range(iterations or int(10e10)):
             self.clear()
             for i, func in enumerate(self.functions):
-                data = func(t * 0.1)
+                data = func(time_ * 0.1)
                 self._fill_grid(data=data, color_num=i)
 
             self.refresh()
-            t += 1
             time.sleep(6e-2)
 
         time.sleep(4)
 
 
 def main(stdscr: _curses.window):
-    plot = LinePlot(
-        screen=stdscr, functions=[get_data , get_data_2, get_data_3])
+    """
+    Execution function for plotting example line plot
+    """
+    plot = LinePlot(screen=stdscr, functions=[get_data, get_data_2, get_data_3])
     plot.plot(iterations=500)
 
 

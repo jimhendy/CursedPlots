@@ -16,6 +16,9 @@ def _ensure_array(x: Union[List, np.ndarray], assert_dimensions=None) -> np.ndar
 
 
 def xy_to_data(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    """
+    Combine `x` and `y` data into a single numpy array of the correct shape
+    """
     x = _ensure_array(x, 1)
     y = _ensure_array(y, 1)
     assert y.shape[0] == x.shape[0]
@@ -37,14 +40,24 @@ def data_y(data: np.ndarray) -> np.ndarray:
 
 
 def data_len(data: np.ndarray) -> int:
+    """
+    Find the length(/number of occurances) of the supplied data
+    """
     return data.shape[0]
 
 
 def data_num_dimensions(data: np.ndarray) -> int:
+    """
+    Find the number of spatial dimentsion of the supplied data
+    Normally to ensure we are in 2 dimensions
+    """
     return data.shape[1]
 
 
 def assert_data_shape(data: np.ndarray) -> None:
+    """
+    Test the supplied data are in the expected shape for plotting
+    """
     # Ensure correct data shape (occurances and dimensions)
     assert len(data.shape) == 2
     # Ensure only 2 dimensions (x and y)
