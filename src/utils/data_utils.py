@@ -1,9 +1,11 @@
-from typing import List, Union
+from typing import List, Optional, Union
 
 import numpy as np
 
 
-def _ensure_array(x: Union[List, np.ndarray], assert_dimensions=None) -> np.ndarray:
+def _ensure_array(
+    x: Union[List, np.ndarray], assert_dimensions: Optional[int] = None
+) -> np.ndarray:
     if isinstance(x, (list, tuple, set)):
         x = np.array(x)
     elif not isinstance(x, np.ndarray):
