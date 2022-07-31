@@ -2,3 +2,4 @@
 *.pyc
 *.*~
 *.lprof
+.mypy_cache

@@ -54,7 +54,7 @@ def _translate_data_to_grid(
     grid_maxs: Tuple[int, ...],
     x_lims: Optional[Tuple[float, float]] = None,
     y_lims: Optional[Tuple[float, float]] = None,
-    buffer: float = 0.1,
+    buffer: float = 0.05,
 ) -> np.ndarray[float, float]:
     """
     Translate plot data (x,y) to coordinates on a grid of shape `grid_shape`.
