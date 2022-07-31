@@ -4,3 +4,5 @@ loguru
 black
 isort
 pytest
+numpy
+numpy_indexed

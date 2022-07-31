@@ -1,8 +1,9 @@
-import collections
 import itertools
+from tabnanny import verbose
 from typing import Callable, Optional, Tuple
 
 import numpy as np
+import numpy_indexed as npi
 
 from utils import data_utils
 
@@ -116,7 +117,7 @@ def _interpolate_regularly(data: np.ndarray[float, float]) -> np.ndarray[float, 
 
 
 def _inverse_distance_to_vertex(data: np.ndarray, increase_x: bool, increase_y: bool):
-    vertex = data.astype(int)  # Round down to bottom left vertex
+    vertex = data.astype(np.int64)  # Round down to bottom left vertex
     if increase_x:
         vertex[:, 0] += 1
     if increase_y:
@@ -143,20 +144,19 @@ def _anti_aliased_data(data: np.ndarray[float, float]):
 
     Similarly for (0,1) and (1,1)
     """
-    weighted_points = (
+    weighted_points = [
         _inverse_distance_to_vertex(data=data, increase_x=x, increase_y=y)
         for x, y in itertools.product((0, 1), (0, 1))
-    )
+    ]
 
-    points = collections.defaultdict(int)
-    for vertices, weights in itertools.chain(weighted_points):
-        for (x, y), weight in zip(vertices, weights):
-            points[(x, y)] += weight
+    vertices = np.concatenate([i[0] for i in weighted_points])
+    weights = np.concatenate([i[1] for i in weighted_points])
 
-    for key, value in points.items():
-        points[key] = min(1, value)
+    locs, weights = npi.group_by(vertices).sum(weights)
 
-    return points
+    weights = np.clip(weights, a_max=1, a_min=0)
+
+    return locs, weights
 
 
 def anti_alias(data: np.ndarray, grid_maxs: Tuple[int, int]):

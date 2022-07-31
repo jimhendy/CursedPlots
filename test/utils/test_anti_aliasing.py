@@ -167,8 +167,11 @@ class TestAntiAlisedData:
     @staticmethod
     def test_single_point() -> None:
         data = data_utils.xy_to_data([0.5], [0.5])
-        expected = {(0, 0): 0.5, (0, 1): 0.5, (1, 0): 0.5, (1, 1): 0.5}
+        expected = (
+            np.array([[0, 0], [0, 1], [1, 0], [1, 1]]),
+            np.array([0.5, 0.5, 0.5, 0.5]),
+        )
         actual = anti_aliased._anti_aliased_data(data)
         assert len(expected) == len(actual)
-        for key, value in expected.items():
-            assert value == actual[key]
+        for i in range(len(expected)):
+            np.testing.assert_almost_equal(actual[i], expected[i])
