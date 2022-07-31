@@ -1,5 +1,4 @@
 import itertools
-from tabnanny import verbose
 from typing import Callable, Optional, Tuple
 
 import numpy as np
@@ -9,43 +8,50 @@ from utils import data_utils
 
 SQRT_TWO = np.sqrt(2)
 
-"""
-x = linspace(...)
-data = np.stack(x, func(x))
-grid = get_viewport_size()
-
-snapped_data = _snap_data_to_grid(data, grid.shape)
-
-x_aligned_data = _interpolate(snapped_data) # Ensure data series is sampled at every x point (once per integer)
-
-anti_alised_data = _do_da_anti_alisin(x_aligned_data) # Use the non-integer parts of the data to snap to integer grid with weights
-"""
-
 
 def _get_extreme(
     lims: Optional[Tuple[float, float]],
-    series_func: Callable,
+    extreme_func: Callable,
+    series: np.ndarray,
     index: int,
+    buffer: float,
 ) -> float:
+    """
+    Find the max/min of a series or use the supplied limit if available
+    """
     if lims:
         assert len(lims) == 2, f"Limits must be of length 2: {lims}"
         assert (
             lims[1] > lims[0]
         ), f"Second limit must be larger than first (min, max): {lims}"
-    return lims[index] if lims else series_func()
+        extreme = lims[index]
+    else:
+        extreme = extreme_func(series)
+        if buffer:
+            offset = np.ptp(series) * buffer
+            extreme += offset if extreme_func is np.max else -offset
+    return extreme
 
 
-def _get_max(lims: Optional[Tuple[float, float]], series: np.ndarray) -> float:
-    return _get_extreme(lims=lims, series_func=series.max, index=1)
+def _get_max(
+    lims: Optional[Tuple[float, float]], series: np.ndarray, buffer: float = 0
+) -> float:
+    return _get_extreme(
+        lims=lims, series=series, extreme_func=np.max, index=1, buffer=buffer
+    )
 
 
-def _get_min(lims: Optional[Tuple[float, float]], series: np.ndarray) -> float:
-    return _get_extreme(lims=lims, series_func=series.min, index=0)
+def _get_min(
+    lims: Optional[Tuple[float, float]], series: np.ndarray, buffer: float = 0
+) -> float:
+    return _get_extreme(
+        lims=lims, series=series, extreme_func=np.min, index=0, buffer=buffer
+    )
 
 
 def _translate_data_to_grid(
     data: np.ndarray[float, float],
-    grid_maxs: Tuple[int, int],
+    grid_maxs: Tuple[int, ...],
     x_lims: Optional[Tuple[float, float]] = None,
     y_lims: Optional[Tuple[float, float]] = None,
     buffer: float = 0.1,
@@ -81,8 +87,6 @@ def _translate_data_to_grid(
             E.g. if `buffer=0.1`, 10% the maximum x value will be at
             `grid_shape[0] - buffer * (max(data[0]) - min(data[0]))`
     """
-    # ToDo add buffer usage
-
     # assert shapes are correct
     data_utils.assert_data_shape(data)
 
@@ -90,8 +94,8 @@ def _translate_data_to_grid(
     y = data_utils.data_y(data)
 
     # get realised maxs n mins
-    maxs = np.array((_get_max(x_lims, x), _get_max(y_lims, y)))
-    mins = np.array((_get_min(x_lims, x), _get_min(y_lims, y)))
+    maxs = np.array((_get_max(x_lims, x, buffer), _get_max(y_lims, y, buffer)))
+    mins = np.array((_get_min(x_lims, x, buffer), _get_min(y_lims, y, buffer)))
 
     # do translation
     return np.multiply(
@@ -144,9 +148,10 @@ def _anti_aliased_data(data: np.ndarray[float, float]):
 
     Similarly for (0,1) and (1,1)
     """
+    bools = (False, True)
     weighted_points = [
         _inverse_distance_to_vertex(data=data, increase_x=x, increase_y=y)
-        for x, y in itertools.product((0, 1), (0, 1))
+        for x, y in itertools.product(bools, bools)
     ]
 
     vertices = np.concatenate([i[0] for i in weighted_points])
@@ -159,7 +164,10 @@ def _anti_aliased_data(data: np.ndarray[float, float]):
     return locs, weights
 
 
-def anti_alias(data: np.ndarray, grid_maxs: Tuple[int, int]):
+def anti_alias(data: np.ndarray, grid_maxs: Tuple[int, ...]):
+    """
+    Translate the supplied data onto the grid and smooth via anti-aliasing
+    """
     grid_data = _translate_data_to_grid(data, grid_maxs=grid_maxs)
     interp_data = _interpolate_regularly(grid_data)
     return _anti_aliased_data(interp_data)

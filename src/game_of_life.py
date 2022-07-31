@@ -14,6 +14,9 @@ characters = (" ", "\u2665")
 
 
 def show_game(stdscr: _curses.window, grid: np.ndarray):
+    """
+    Display the current grid
+    """
     [
         stdscr.addch(row_num, col_num, characters[char])
         for row_num, row in enumerate(grid)
@@ -22,13 +25,16 @@ def show_game(stdscr: _curses.window, grid: np.ndarray):
     stdscr.refresh()
 
 
-def game_of_life(stdscr: _curses.window, iterations: Optional[int] = None):
+def game_of_life(stdscr: _curses.window, iterations: Optional[int] = None) -> None:
+    """
+    Start a little game of life
+    """
     # Clear screen
     curses.curs_set(False)  # Hide the cursor
-    stdscr.clear()  #  Clear the window
+    stdscr.clear()  # Clear the window
 
-    board_size: Tuple[int, int] = tuple(i - 1 for i in stdscr.getmaxyx())
-    full_size: Tuple[int, int] = tuple(i + 2 for i in board_size)
+    board_size: Tuple[int, ...] = tuple(i - 1 for i in stdscr.getmaxyx())
+    full_size: Tuple[int, ...] = tuple(i + 2 for i in board_size)
 
     full_board = np.zeros(full_size, dtype=np.uint8)
 
@@ -41,27 +47,27 @@ def game_of_life(stdscr: _curses.window, iterations: Optional[int] = None):
 
     iterations = iterations or int(10e10)
 
-    sumOver = tuple(-(i + 1) for i in range(n_dims))
+    sum_over = tuple(-(i + 1) for i in range(n_dims))
 
     # index is number of neighbors alive
-    ruleOfLifeAlive = np.zeros(8 + 1, np.uint8)  # default all to dead
-    ruleOfLifeAlive[[2, 3]] = 1  # alive stays alive <=> 2 or 3 neighbors
+    rule_of_life_alive = np.zeros(8 + 1, np.uint8)  # default all to dead
+    rule_of_life_alive[[2, 3]] = 1  # alive stays alive <=> 2 or 3 neighbors
 
-    ruleOfLifeDead = np.zeros(8 + 1, np.uint8)  # default all to dead
-    ruleOfLifeDead[3] = 1  # dead switches to living <=> 3 neighbors
+    rule_of_life_dead = np.zeros(8 + 1, np.uint8)  # default all to dead
+    rule_of_life_dead[3] = 1  # dead switches to living <=> 3 neighbors
 
-    newShape = [_len - 2 for _len in full_board.shape]
-    newShape.extend([3] * n_dims)
-    newStrides = full_board.strides + full_board.strides
+    new_shape = [_len - 2 for _len in full_board.shape]
+    new_shape.extend([3] * n_dims)
+    new_strides = full_board.strides + full_board.strides
 
     show_game(stdscr, board)
     for _ in range(iterations):
         time.sleep(7e-2)
 
-        neighborhoods = as_strided(full_board, shape=newShape, strides=newStrides)
-        neighborCt = np.sum(neighborhoods, sumOver) - board
+        neighborhoods = as_strided(full_board, shape=new_shape, strides=new_strides)
+        neighbor_ct = np.sum(neighborhoods, sum_over) - board
         board[:] = np.where(
-            board, ruleOfLifeAlive[neighborCt], ruleOfLifeDead[neighborCt]
+            board, rule_of_life_alive[neighbor_ct], rule_of_life_dead[neighbor_ct]
         )
 
         show_game(stdscr, board)
