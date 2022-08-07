@@ -1,6 +1,6 @@
 import curses
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 import _curses
 import numpy as np
@@ -63,7 +63,7 @@ class Plot(ABC):  # pylint: disable=too-many-instance-attributes
         The maximum grid row/column we are willing to plot in
         Slightly reduced from total grid to ensure we don't overflow
         """
-        return tuple(i - 2 for i in self.screen_size[::-1])
+        return tuple(i for i in self.screen_size[::-1])
 
     def _init_curses(self) -> None:
         curses.curs_set(False)
@@ -97,15 +97,25 @@ class Plot(ABC):  # pylint: disable=too-many-instance-attributes
         assert 0 <= alpha <= 1
         return Plot.CHARACTERS[int(alpha * (self.N_CHCRACTERS - 0.5))]
 
-    def set_char(
-        self, row_num: int, col_num: int, char: str, color_num: int = 0
+    def set_char(  # pylint: disable=too-many-arguments
+        self,
+        row_num: int,
+        col_num: int,
+        char: str,
+        color_num: int = 0,
+        extra_format: Optional[List[Any]] = None,
     ) -> None:
         """
         Add a character to the screen at position `row_num` and `col_num`.
         """
+        assert extra_format is None or isinstance(extra_format, list)
         row_num = self.rows - row_num  # Invert y-axis
         if (0 <= row_num < self.rows) and (0 <= col_num < self.columns):
-            self.screen.addch(row_num, col_num, char, curses.color_pair(color_num + 2))
+            format_ = curses.color_pair(color_num + 2)
+            if extra_format:
+                for ex_format in extra_format:
+                    format_ |= ex_format
+            self.screen.addch(row_num, col_num, char, format_)
 
     def refresh(self) -> None:
         """Print the current screen to the terminal"""
@@ -157,6 +167,7 @@ class Plot(ABC):  # pylint: disable=too-many-instance-attributes
                 col_num=point[0],
                 char=character,
                 color_num=6,
+                extra_format=[curses.A_BOLD],
             )
 
     @abstractmethod
