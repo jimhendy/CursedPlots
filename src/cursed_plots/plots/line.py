@@ -1,9 +1,7 @@
 import time
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, List, Optional
 
 import numpy as np
-
-from cursed_plots.utils.data_utils import data_len
 
 from ..utils import anti_aliased, data_utils
 from .base import Plot
@@ -37,25 +35,25 @@ class LinePlot(Plot):
                     color_num=color_num,
                 )
 
-    def _set_x_y_lims(self, data: List[np.ndarray]) -> None:
+    def _set_x_y_lims(self, all_data: List[np.ndarray]) -> None:
 
         if self._static_x_lims and self._static_y_lims:
             return
 
-        x_min = data_utils.data_x(data[0]).min()
-        x_max = data_utils.data_x(data[0]).max()
-        y_min = data_utils.data_y(data[0]).min()
-        y_max = data_utils.data_y(data[0]).max()
-        for d in data[1:]:
-            x_min = min(x_min, data_utils.data_x(d).min())
-            x_max = min(x_max, data_utils.data_x(d).max())
-            y_min = min(y_min, data_utils.data_y(d).min())
-            y_max = min(y_max, data_utils.data_y(d).max())
+        x_min = data_utils.data_x(all_data[0]).min()
+        x_max = data_utils.data_x(all_data[0]).max()
+        y_min = data_utils.data_y(all_data[0]).min()
+        y_max = data_utils.data_y(all_data[0]).max()
+        for data in all_data[1:]:
+            x_min = min(x_min, data_utils.data_x(data).min())
+            x_max = min(x_max, data_utils.data_x(data).max())
+            y_min = min(y_min, data_utils.data_y(data).min())
+            y_max = min(y_max, data_utils.data_y(data).max())
 
         if not self._static_x_lims:
-            self.x_lims = [x_min, x_max]
+            self.x_lims = (x_min, x_max)
         if not self._static_y_lims:
-            self.y_lims = [y_min, y_max]
+            self.y_lims = (y_min, y_max)
 
     def plot(self, iterations: Optional[int] = None) -> None:
         """
