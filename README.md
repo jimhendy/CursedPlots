@@ -4,6 +4,14 @@ Using the [`curses`](https://docs.python.org/3/howto/curses.html) module ([docs]
 
 ![Example plotting animation](curves.gif)
 
+## Installation
+
+It is in the pipeline to create a proper installer with `poetry`. Untill then let's use the simple solution of:
+ * `conda create -n cursed_plots`
+ * `pip install -r requirements-dev.txt`
+ * `pre-commit install`
+ * `python examples\lines.py`
+
 ## ToDos
 
  - [ ] Add axis if max(data) * min(data) < 0

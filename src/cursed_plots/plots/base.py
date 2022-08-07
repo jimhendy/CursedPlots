@@ -1,6 +1,6 @@
 import curses
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional, Tuple, List
+from typing import Any, Callable, List, Optional, Tuple
 
 import _curses
 import numpy as np
@@ -97,7 +97,7 @@ class Plot(ABC):  # pylint: disable=too-many-instance-attributes
         assert 0 <= alpha <= 1
         return Plot.CHARACTERS[int(alpha * (self.N_CHCRACTERS - 0.5))]
 
-    def set_char(
+    def set_char(  # pylint: disable=too-many-arguments
         self,
         row_num: int,
         col_num: int,
@@ -111,11 +111,11 @@ class Plot(ABC):  # pylint: disable=too-many-instance-attributes
         assert extra_format is None or isinstance(extra_format, list)
         row_num = self.rows - row_num  # Invert y-axis
         if (0 <= row_num < self.rows) and (0 <= col_num < self.columns):
-            format = curses.color_pair(color_num + 2)
+            format_ = curses.color_pair(color_num + 2)
             if extra_format:
                 for ex_format in extra_format:
-                    format |= ex_format
-            self.screen.addch(row_num, col_num, char, format)
+                    format_ |= ex_format
+            self.screen.addch(row_num, col_num, char, format_)
 
     def refresh(self) -> None:
         """Print the current screen to the terminal"""
