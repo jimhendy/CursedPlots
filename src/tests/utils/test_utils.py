@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from utils import data_utils
+from cursed_plots.utils import data_utils
 
 
 class TestXYToData:

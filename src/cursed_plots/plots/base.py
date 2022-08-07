@@ -237,10 +237,10 @@ class Plot(ABC):
         # Don't return anything outside the limits
         # remove this for now as causes data points to be linked as intermediate data removed
         """data = data[
-            (data_utils.data_x(data) >= mins[0]) & 
-            (data_utils.data_y(data) >= mins[1]) & 
-            (data_utils.data_x(data) <= maxs[0]) & 
-            (data_utils.data_y(data) <= maxs[1]) 
+            (data_utils.data_x(data) >= mins[0]) &
+            (data_utils.data_y(data) >= mins[1]) &
+            (data_utils.data_x(data) <= maxs[0]) &
+            (data_utils.data_y(data) <= maxs[1])
         ]"""
 
         # do translation
