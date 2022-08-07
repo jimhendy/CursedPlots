@@ -18,7 +18,7 @@ class TestTranslateDataToGrid:
         x = [0, 0.5, 1]
         y = [0, 0.5, 1]
         data = data_utils.xy_to_data(x, y)
-        plot = get_mock_plot(grid_maxs=(1, 1))
+        plot = get_mock_plot(screen_size=(1, 1))
         actual = plot._translate_data_to_grid(data=data)
         np.testing.assert_equal(data, actual)
 
@@ -27,7 +27,7 @@ class TestTranslateDataToGrid:
         x = [0, 0.5, 1]
         y = [0, 0.5, 1]
         data = data_utils.xy_to_data(x, y)
-        plot = get_mock_plot(grid_maxs=(10, 10))
+        plot = get_mock_plot(screen_size=(10, 10))
         actual = plot._translate_data_to_grid(data=data)
         expected = data_utils.xy_to_data(
             [i * plot.grid_maxs[0] for i in x], [i * plot.grid_maxs[1] for i in y]
@@ -39,7 +39,7 @@ class TestTranslateDataToGrid:
         x = [0, 1]
         y = [0, 1]
         data = data_utils.xy_to_data(x, y)
-        plot = get_mock_plot(grid_maxs=(10, 5))
+        plot = get_mock_plot(screen_size=(10, 5))
         actual = plot._translate_data_to_grid(data=data)
         expected = data_utils.xy_to_data(
             [i * plot.grid_maxs[0] for i in x], [i * plot.grid_maxs[1] for i in y]
@@ -51,7 +51,7 @@ class TestTranslateDataToGrid:
         x = np.linspace(0, 100)
         y = np.linspace(0, 200)
         data = data_utils.xy_to_data(x, y)
-        plot = get_mock_plot(grid_maxs=(10, 2))
+        plot = get_mock_plot(screen_size=(10, 2))
         actual = plot._translate_data_to_grid(data=data)
         expected = data_utils.xy_to_data(
             [i * plot.grid_maxs[0] / x.max() for i in x],
@@ -65,7 +65,7 @@ class TestTranslateDataToGrid:
         y = x[:]
         scale = lambda i: (i - min(x)) / (max(x) - min(x))
         data = data_utils.xy_to_data(x, y)
-        plot = get_mock_plot(grid_maxs=(10, 5))
+        plot = get_mock_plot(screen_size=(10, 5))
         actual = plot._translate_data_to_grid(data=data)
         expected = data_utils.xy_to_data(
             [scale(i) * plot.grid_maxs[0] for i in x],

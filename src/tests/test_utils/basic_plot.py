@@ -18,13 +18,10 @@ class BasicPlot(Plot):
 
 def get_mock_plot(
     screen_size: Optional[Tuple[int, int]] = None,
-    grid_maxs: Optional[Tuple[int, int]] = None,
     **kwargs: Any,
 ):
     plot = BasicPlot(**kwargs)
     if screen_size:
         plot._fetch_screen_size = lambda *args, **kwargs: screen_size
         plot.screen_size = plot._fetch_screen_size()
-    if grid_maxs:
-        plot.screen_size = [i + 2 for i in grid_maxs[::-1]]
     return plot
