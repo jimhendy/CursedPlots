@@ -1,5 +1,4 @@
 import numpy as np
-
 from utils import anti_aliased, data_utils
 
 
@@ -125,7 +124,7 @@ class TestInterpolateRegularly:
         data = data_utils.xy_to_data(x=array, y=array)
         expected_series = np.arange(array.max() + 1)
         expected = data_utils.xy_to_data(x=expected_series, y=expected_series)
-        actual = anti_aliased._interpolate_regularly(data)
+        actual = anti_aliased.interpolate_regularly(data)
         np.testing.assert_almost_equal(actual, expected)
 
     @staticmethod
@@ -136,7 +135,7 @@ class TestInterpolateRegularly:
             array.min(), array.max(), num=int(array.max() - array.min()) + 1
         )
         expected = data_utils.xy_to_data(x=expected_series, y=expected_series)
-        actual = anti_aliased._interpolate_regularly(data)
+        actual = anti_aliased.interpolate_regularly(data)
         np.testing.assert_almost_equal(actual, expected)
 
     @staticmethod
@@ -146,7 +145,7 @@ class TestInterpolateRegularly:
         data = data_utils.xy_to_data(x=x, y=y)
         expected_series = np.array([0, 1, 2, 3, 4, 5, 7, 9, 11, 13, 15])
         expected = data_utils.xy_to_data(x=np.arange(x.max() + 1), y=expected_series)
-        actual = anti_aliased._interpolate_regularly(data)
+        actual = anti_aliased.interpolate_regularly(data)
         np.testing.assert_almost_equal(actual, expected)
 
 
@@ -224,7 +223,7 @@ class TestAntiAlisedData:
             np.array([[0, 0], [0, 1], [1, 0], [1, 1]]),
             np.array([0.5, 0.5, 0.5, 0.5]),
         )
-        actual = anti_aliased._anti_aliased_data(data)
+        actual = anti_aliased.anti_aliased_data(data)
         assert len(expected) == len(actual)
         for i in range(len(expected)):
             np.testing.assert_almost_equal(actual[i], expected[i])

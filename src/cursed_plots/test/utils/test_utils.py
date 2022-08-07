@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-
 from utils import data_utils
 
 
