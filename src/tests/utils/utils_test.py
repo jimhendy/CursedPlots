@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from cursed_plots.utils import data_utils
 
 

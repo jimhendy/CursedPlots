@@ -9,6 +9,7 @@ repos:
     -   id: no-commit-to-branch
         args: ["--branch", "main"]
     -   id: name-tests-test
+        exclude: ^src/tests/test_utils/
     -   id: check-ast
 -   repo: https://github.com/psf/black
     rev: 22.6.0

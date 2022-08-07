@@ -1,5 +1,5 @@
 import itertools
-from typing import Callable, Optional, Tuple
+from typing import Tuple
 
 import numpy as np
 import numpy_indexed as npi

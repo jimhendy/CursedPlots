@@ -1,48 +1,6 @@
 import numpy as np
+
 from cursed_plots.utils import anti_aliased, data_utils
-
-
-
-
-
-class TestGetExtreme:
-    @staticmethod
-    def test_max_no_lims():
-        data = list(range(10))
-        expected = max(data)
-        actual = anti_aliased._get_max(lims=None, series=data)
-        assert expected == actual
-
-    @staticmethod
-    def test_min_no_lims():
-        data = list(range(10))
-        expected = min(data)
-        actual = anti_aliased._get_min(lims=None, series=data)
-        assert expected == actual
-
-    @staticmethod
-    def test_max_with_lims():
-        data = list(range(10))
-        lims = [0, 5]
-        expected = lims[1]
-        actual = anti_aliased._get_max(lims=lims, series=data)
-        assert expected == actual
-
-    @staticmethod
-    def test_min_with_lims():
-        data = list(range(10))
-        lims = [-100, 5]
-        expected = lims[0]
-        actual = anti_aliased._get_min(lims=lims, series=data)
-        assert expected == actual
-
-    @staticmethod
-    def test_max_offset():
-        data = list(range(10))
-        buffer = 0.5
-        expected = max(data) + buffer * np.ptp(data)
-        actual = anti_aliased._get_max(lims=None, series=data, buffer=buffer)
-        assert actual == expected
 
 
 class TestInterpolateRegularly:

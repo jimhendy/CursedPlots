@@ -5,7 +5,7 @@ import numpy as np
 from _utils import ensure_module_available
 
 ensure_module_available()
-from cursed_plots import LinePlot, data_utils
+from cursed_plots import LinePlot, data_utils  # pylint: disable=wrong-import-position
 
 X_LIMS = [-5, 5]
 Y_LIMS = [-1.5, 1.5]
@@ -25,7 +25,7 @@ def cos_func(time_: int) -> np.ndarray:
     return data_utils.xy_to_data(X, y)
 
 
-def tan_func(time_: int) -> np.ndarray:
+def tan_func(time_: int) -> np.ndarray:  # pylint: disable=unused-argument
     """Example power function"""
     y = np.tan(X)
     return data_utils.xy_to_data(X, y)

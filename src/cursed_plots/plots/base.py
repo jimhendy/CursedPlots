@@ -1,6 +1,5 @@
 import curses
 from abc import ABC, abstractmethod
-from ctypes.wintypes import LARGE_INTEGER
 from typing import Any, Callable, Optional, Tuple
 
 import _curses
@@ -13,7 +12,7 @@ class PlottingException(Exception):
     """Simple exception to localise errors to Plot subclasses"""
 
 
-class Plot(ABC):
+class Plot(ABC):  # pylint: disable=too-many-instance-attributes
     """
     Abstract base class for a plot. Implements screen access functionality
 
@@ -40,6 +39,7 @@ class Plot(ABC):
     CHARACTERS = list(
         r"""$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^`'. """
     )[::-1]
+    N_CHCRACTERS = len(CHARACTERS)
 
     def __init__(
         self,
@@ -54,10 +54,18 @@ class Plot(ABC):
         self._static_x_lims = self.x_lims is not None
         self._static_y_lims = self.y_lims is not None
         self.buffer = buffer
-        self.n_characters = len(Plot.CHARACTERS)
         self.screen_size = self._fetch_screen_size()
-        self.grid_maxs: Tuple[int, ...] = tuple(i - 2 for i in self.screen_size[::-1])
+        self._init_curses()
 
+    @property
+    def grid_maxs(self) -> Tuple[int, ...]:
+        """
+        The maximum grid row/column we are willing to plot in
+        Slightly reduced from total grid to ensure we don't overflow
+        """
+        return tuple(i - 2 for i in self.screen_size[::-1])
+
+    def _init_curses(self) -> None:
         curses.curs_set(False)
         curses.start_color()
         curses.use_default_colors()
@@ -87,7 +95,7 @@ class Plot(ABC):
 
     def _character_from_alpha(self, alpha: float) -> str:
         assert 0 <= alpha <= 1
-        return Plot.CHARACTERS[int(alpha * (self.n_characters - 0.5))]
+        return Plot.CHARACTERS[int(alpha * (self.N_CHCRACTERS - 0.5))]
 
     def set_char(
         self, row_num: int, col_num: int, char: str, color_num: int = 0
@@ -142,7 +150,7 @@ class Plot(ABC):
                     character="+",
                 )
 
-    def _add_axis(self, data, character: str) -> None:
+    def _add_axis(self, data: np.ndarray, character: str) -> None:
         for point in data:
             self.set_char(
                 row_num=point[1],
@@ -233,15 +241,6 @@ class Plot(ABC):
                 self._get_min(self.y_lims, y, self.buffer),
             )
         )
-
-        # Don't return anything outside the limits
-        # remove this for now as causes data points to be linked as intermediate data removed
-        """data = data[
-            (data_utils.data_x(data) >= mins[0]) &
-            (data_utils.data_y(data) >= mins[1]) &
-            (data_utils.data_x(data) <= maxs[0]) &
-            (data_utils.data_y(data) <= maxs[1])
-        ]"""
 
         # do translation
         data = np.multiply(
